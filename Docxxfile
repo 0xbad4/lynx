@@ -1,0 +1,73 @@
+{
+  "project": {
+    "name": "Lynx",
+    "version": "1.0.0",
+    "author": "Badr Fadel",
+    "repo": "https://github.com/0xbad4/lynx",
+    "brief": "C++ header-only networking toolkit for low-level networking and packet utilities.",
+    "description": "Lightweight C++ library for low-level networking tasks, packet manipulation, and network interface helpers. It provides a set of reusable building blocks for working with raw network data, address conversion, checksum routines, and networking interfaces.",
+
+    "nav": [
+      {
+        "label": "Tests",
+        "url": "./TESTS.md",
+        "type": "markdown",
+        "icon": "vial"
+      },
+      {
+        "label": "Tools",
+        "url": "./TOOLS.md",
+        "type": "markdown",
+        "icon": "tools"
+      },
+      {
+        "label": "Changelog",
+        "url": "./CHANGELOG.md",
+        "type": "markdown",
+        "icon": "bookmark"
+      },
+      {
+        "label": "Licence",
+        "url": "./LICENCE.md",
+        "type": "markdown",
+        "icon": "balance-scale"
+      },
+      {
+        "label": "Source Code",
+        "url": "https://github.com/0xbad4/lynx",
+        "icon": "code"
+      },
+      {
+        "label": "Developer",
+        "url": "https://github.com/0xbad4",
+        "icon": "user"
+      }
+    ],
+
+    "title": "Lynx | API Reference",
+    "icon": "img/lynx.png",
+    "favicon": "img/lynx.png",
+    
+    "hjs_code_theme": "atom-one-dark"
+  },
+
+  "input": [
+    "include"
+  ],
+
+  "patterns": [
+    "*.h"
+  ],
+
+  "access": [
+    "public",
+    "protected",
+    "private"
+  ],
+
+  "include_undocumented": true,
+  "group_by": "namespace",
+  "root_namespace": "",
+  "source_url": "https://github.com/0xbad4/lynx/blob/main/{file}#L{line}",
+  "overview_file": "./README.md"
+}
