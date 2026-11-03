@@ -23,3 +23,23 @@ All notable changes to this project are documented in this file.
 ### Fixed
 
 - No fixes recorded for this initial release.
+
+## [1.0.1] - 2026-10-17
+
+### Added
+
+- Added memory model documentation.
+- TLV mutators
+
+## Fixed
+
+- Interface::read - Potential dangling pointer issue in `Raw` construction when using a `view` that does not keep the underlying buffer alive. Now, `Raw` is constructed with a `shared_ptr` to the buffer's owner, ensuring the memory remains valid.
+
+- IPv4::patch - Checksum was written in host-order as checksum::inet returns a host-order value. Now, the checksum is converted to network byte order before patching the buffer. And the patching is done using a `const uint8_t*` pointer to avoid potential segmentation faults.
+
+- ProtocolBaseObject::unload - drops upperlayer thats just added if no trailing bytes.
+
+## Changed
+
+- TLV's memory behavior, now it imitates std::vector.
+

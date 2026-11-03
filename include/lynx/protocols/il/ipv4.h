@@ -375,10 +375,14 @@ namespace lynx::proto
                     utils::mem::zero(buffer.begin() + hoff + 10, 2);
 
                     // calc
+                    // NOTE: returns host byte order
                     uint16_t computed = utils::checksum::inet(buffer.begin() + hoff, IPV4_HDR_LEN);
 
+                    const uint16_t net_cs = utils::mem::bswap<uint16_t>(computed);
+
                     // patch
-                    buffer.patch(hoff + 10, reinterpret_cast<uint8_t*>(computed), 2);
+                    // NOTE: previous implementation can cause segfault
+                    buffer.patch(hoff + 10, reinterpret_cast<const uint8_t*>(&net_cs), 2);
                 }
             }
     };

@@ -1,12 +1,19 @@
 {
   "metadata": {
     "name": "Lynx",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Badr Fadel",
     "repo": "https://github.com/0xbad4/lynx",
     "brief": "C++ header-only networking toolkit for low-level networking and packet utilities.",
     "description": "Lightweight C++ library for low-level networking tasks, packet manipulation, and network interface helpers. It provides a set of reusable building blocks for working with raw network data, address conversion, checksum routines, and networking interfaces.",
     "nav": [
+      {
+        "label": "Memory Management",
+        "url": "./MEMORY_MODEL.md",
+        "type": "markdown",
+        "icon": "memory",
+        "content": "# Memory model\n\n**Buffers own. Views borrow.**\n\nEvery byte in the library lives in exactly one owned allocation. Everything else is a window over it. Parsing reads through windows and copies nothing. Producing bytes allocates once, at the exact size needed.\n\n![Summary Diagram](./img/memory.png)\n\n## Building blocks\n\n| Piece | Role | Owns memory |\n|---|---|---|\n| `view` | A pointer and a length over existing bytes. Cheap to copy, never allocates, can carry an error. | no |\n| `Buffer` | A shared allocation with an offset, a valid length and a capacity. | yes |\n| Layer object | One unit of structure over bytes. Holds a view of its bytes and, only when it created them, the owner of those bytes. | sometimes |\n\n> Layer objects link to the layer above and below through plain pointers. These links never own anything.\n\n## Ownership rules\n\n1. An allocation is released when its last owner is released.\n2. A view is valid only while an owner of its bytes is alive.\n3. A layer that borrows its bytes does not keep them alive. A layer that created its bytes does.\n4. Pointers between layers are navigation only.\n5. Capacity belongs to the allocation. A view or a serialized result covers only the valid bytes.\n\n## Capture: zero-copy\n\n- Received bytes land in one allocation sized to the capture length.\n- The top-level object shares ownership of that allocation with an offset and a length.\n- Each layer takes a view of everything after its parent's header. A layer reads its own header from the start of its view and passes the rest down.\n- No header, field or payload is copied. Layers form a staircase of shrinking views over one allocation.\n- Parents must outlive the layers derived from them.\n\n## Craft: exact size\n\n- Each layer allocates storage for its own header when it is created. These are separate allocations with separate addresses.\n- Linking layers sets their pointers and trims the lower layer's view to its own header. Nothing moves.\n- `size()` is the sum along the chain.\n- Serializing allocates one buffer of exactly that size, then each layer writes itself into it in order.\n- Fields that depend on later content, such as lengths and checksums, are rewritten in place once everything is laid out.\n- Helper buffers used to compute those fields are temporary and released when the call returns.\n- The finished buffer is sent. The caller can optionally receive shared ownership of it.\n\n## Buffer operations\n\n| Operation | Effect |\n|---|---|\n| `alloc(n)` | New zero-filled allocation of exactly `n` bytes, valid length 0. |\n| `reserve(n)` | Advances the valid length by `n` and returns writable memory. |\n| `write(src, n)` | Copies `n` bytes at the valid length and advances it. |\n| `patch(pos, src, n)` | Overwrites bytes at `pos` without moving the valid length. |\n| `wrap(owner, off, len)` | Read-only window over an existing allocation. Capacity equals length. |\n\nA buffer never grows. Writes past capacity fail and set the error state.\n\n## Growable containers\n\nContainers that change size during their life follow the vector model.\n\n- **Size and capacity are separate.** The view covers exactly the valid bytes. Spare capacity is never serialized.\n- **Appending within capacity moves nothing.** Pointers and views into the container stay valid.\n- **Growth is geometric.** When capacity runs out, capacity at least doubles, so appends cost amortized constant time.\n- **Reallocation invalidates everything** that points into the container. Removal invalidates from the first removed element onward.\n- **Capacity is kept.** Removal and clearing keep capacity. `shrink_to_fit` releases it.\n- **`reserve` preallocates** so later appends never allocate.\n- **Borrowed until mutated.** A container built over existing bytes borrows them. The first mutation copies them into owned storage, so the source is never modified.\n- **Value semantics.** A copy owns an independent copy of the bytes. A move transfers storage and leaves the source empty.\n- **Failure is non-destructive.** Mutators report an error and leave the container unchanged.\n\n## Lifetimes and invalidation\n\n| Event | What becomes invalid |\n|---|---|\n| Last owner released | Every view over that allocation |\n| Container reallocates | All views and pointers into the container |\n| Container removes elements | Views at or after the first removed element |\n| Container appends within capacity | Nothing |\n| Layers unlinked | The links only, never the bytes |\n\n## Rules of thumb\n\n- Borrow to read. Allocate to produce.\n- One allocation per serialized packet.\n- Never keep a view longer than its owner.\n- Patch in place instead of rebuilding.\n- Check the error state once at the top. The first failure is the one reported."
+      },
       {
         "label": "Tests",
         "url": "./TESTS.md",
@@ -26,7 +33,7 @@
         "url": "./CHANGELOG.md",
         "type": "markdown",
         "icon": "bookmark",
-        "content": "# Changelog\n\nAll notable changes to this project are documented in this file.\n\n## [1.0.0] - 2026-10-01\n\n### Added\n\n* Initial release of the `lynx` library.\n* Header-only C++ interfaces for protocol parsing and object access.\n* Core support for buffer management, view handling, error reporting, and configuration types.\n* Ethernet frame support, including 802.1Q and QinQ tagging.\n* PPP and PPPoE protocol support, including LCP, CHAP, PAP, IPCP, and IPv6CP.\n* IPv4, IPv6, ARP, ICMP, ICMPv6, IGMP, TCP, UDP, and SCTP protocol definitions.\n* TLV and raw frame helper classes for protocol payload inspection.\n* Linux-specific network interface and socket utilities for interface lookup, raw socket creation, and address retrieval.\n* Unit tests covering link-layer protocol classification and socket/interface behavior.\n\n### Changed\n\n- No previous release history.\n\n### Fixed\n\n- No fixes recorded for this initial release.\n"
+        "content": "# Changelog\n\nAll notable changes to this project are documented in this file.\n\n## [1.0.0] - 2026-10-01\n\n### Added\n\n* Initial release of the `lynx` library.\n* Header-only C++ interfaces for protocol parsing and object access.\n* Core support for buffer management, view handling, error reporting, and configuration types.\n* Ethernet frame support, including 802.1Q and QinQ tagging.\n* PPP and PPPoE protocol support, including LCP, CHAP, PAP, IPCP, and IPv6CP.\n* IPv4, IPv6, ARP, ICMP, ICMPv6, IGMP, TCP, UDP, and SCTP protocol definitions.\n* TLV and raw frame helper classes for protocol payload inspection.\n* Linux-specific network interface and socket utilities for interface lookup, raw socket creation, and address retrieval.\n* Unit tests covering link-layer protocol classification and socket/interface behavior.\n\n### Changed\n\n- No previous release history.\n\n### Fixed\n\n- No fixes recorded for this initial release.\n\n## [1.0.1] - 2026-10-17\n\n### Added\n\n- Added memory model documentation.\n- TLV mutators\n\n## Fixed\n\n- Interface::read - Potential dangling pointer issue in `Raw` construction when using a `view` that does not keep the underlying buffer alive. Now, `Raw` is constructed with a `shared_ptr` to the buffer's owner, ensuring the memory remains valid.\n\n- IPv4::patch - Checksum was written in host-order as checksum::inet returns a host-order value. Now, the checksum is converted to network byte order before patching the buffer. And the patching is done using a `const uint8_t*` pointer to avoid potential segmentation faults.\n\n- ProtocolBaseObject::unload - drops upperlayer thats just added if no trailing bytes.\n\n## Changed\n\n- TLV's memory behavior, now it imitates std::vector.\n\n"
       },
       {
         "label": "Licence",
@@ -6990,6 +6997,8 @@
             {
               "type": "class",
               "name": "TLV",
+              "brief": "Contiguous list of type-length-value entries.",
+              "description": "Entries are stored back to back in a single allocation. Capacity grows geometrically and is never released by removal. Appending within capacity invalidates nothing. Reallocation invalidates every pointer and view into the list. Removal invalidates those at or after the first removed entry.\n\nA list constructed from a view borrows the bytes until its first mutation, which copies them into owned storage. Copies own their bytes; moves transfer them and leave the source empty.\n\nMutators return an Error and leave the list unchanged on failure.",
               "bases": [
                 {
                   "name": "ProtocolBaseObject",
@@ -7004,167 +7013,16 @@
               ],
               "content": [
                 {
-                  "type": "constructor",
-                  "name": "TLV",
+                  "type": "field",
+                  "name": "max_value_size",
                   "access": "public",
-                  "brief": "Constructs an invalid TLV object.",
-                  "description": "Initializes the object with a malformed-packet error. No protocol header is allocated because the object does not represent a valid TLV node.",
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 44,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L44"
-                  }
-                },
-                {
-                  "type": "constructor",
-                  "name": "TLV",
-                  "access": "public",
-                  "brief": "Constructs a TLV buffer from an array of TLV nodes.",
-                  "description": "Calculates the total size of all supplied nodes, allocates a contiguous buffer of exactly that size, and copies each node into the buffer in order.",
-                  "notes": [
-                    {
-                      "type": "info",
-                      "content": "The node data is copied into newly allocated storage; the constructed TLV object does not depend on the lifetime of the input nodes."
-                    }
-                  ],
-                  "params": [
-                    {
-                      "name": "head",
-                      "type": "tlv_node*",
-                      "description": "Array of TLV nodes to concatenate."
-                    },
-                    {
-                      "name": "size",
-                      "type": "uint32_t",
-                      "description": "Number of nodes in the array."
-                    }
-                  ],
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 59,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L59"
-                  }
-                },
-                {
-                  "type": "constructor",
-                  "name": "TLV",
-                  "access": "public",
-                  "brief": "Constructs a TLV container from an existing byte view.",
-                  "params": [
-                    {
-                      "name": "v",
-                      "type": "view",
-                      "description": "Source bytes containing one or more TLV entries."
-                    }
-                  ],
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 89,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L89"
-                  }
-                },
-                {
-                  "type": "method",
-                  "name": "size",
-                  "access": "public",
-                  "brief": "Returns the total number of bytes currently stored by this TLV object.",
+                  "brief": "Largest value that fits in one entry.",
                   "flags": [
-                    "const",
-                    "noexcept",
-                    "nodiscard"
+                    "static",
+                    "constexpr"
                   ],
-                  "return": {
-                    "type": "uint32_t",
-                    "description": "Total size in bytes."
-                  },
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 97,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L97"
-                  }
-                },
-                {
-                  "type": "method",
-                  "name": "load",
-                  "access": "public",
-                  "brief": "Loads a TLV buffer into this object.",
-                  "flags": [
-                    "noexcept"
-                  ],
-                  "params": [
-                    {
-                      "name": "buf",
-                      "type": "Buffer&",
-                      "description": "Buffer to load."
-                    }
-                  ],
-                  "return": {
-                    "type": "void"
-                  },
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 106,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L106"
-                  }
-                },
-                {
-                  "type": "method",
-                  "name": "hsize",
-                  "access": "public",
-                  "brief": "Returns the fixed header size of the TLV container.",
-                  "flags": [
-                    "const",
-                    "noexcept",
-                    "nodiscard"
-                  ],
-                  "return": {
-                    "type": "uint32_t",
-                    "description": "Always 0, because this container stores a variable-length sequence of TLV entries."
-                  },
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 115,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L115"
-                  }
-                },
-                {
-                  "type": "method",
-                  "name": "get",
-                  "access": "public",
-                  "brief": "Looks up a TLV by its type code.",
-                  "description": "Returns a view of the TLV value when the requested type is found. This class does not set errors directly. If the lookup encounters a malformed TLV, an empty view carrying the corresponding error is returned.",
-                  "flags": [
-                    "nodiscard"
-                  ],
-                  "params": [
-                    {
-                      "name": "c",
-                      "type": "uint8_t"
-                    }
-                  ],
-                  "return": {
-                    "type": "view",
-                    "description": "A view of the TLV value, or an empty view carrying an error if the lookup fails."
-                  },
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 129,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L129"
-                  }
-                },
-                {
-                  "type": "method",
-                  "name": "next",
-                  "access": "public",
-                  "brief": "Advances to the next entry.",
-                  "description": "```cpp\nwhile(opts.next()) {\n     auto tlv = opts.current();\n}\nopts.reset();\n```",
-                  "flags": [
-                    "noexcept"
-                  ],
-                  "return": {
-                    "type": "bool",
-                    "description": "`true` if there was a next entry - call current() to get it. `false` once there's nothing left to advance to, or once a claimed length has run past the available data; current() still holds the last valid entry either way, and current()'s ok parameter tells those two cases apart."
-                  },
+                  "field_type": "uint32_t",
+                  "value": "253",
                   "source": {
                     "file": "include/lynx/protocols/extras/tlv.h",
                     "line": 183,
@@ -7173,95 +7031,195 @@
                 },
                 {
                   "type": "method",
-                  "name": "current",
+                  "name": "max_size",
                   "access": "public",
-                  "brief": "Returns the current entry without advancing.",
+                  "brief": "Returns the largest possible list size in bytes.",
                   "flags": [
-                    "const",
+                    "static",
+                    "constexpr",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 188,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L188"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs an empty list.",
+                  "flags": [
+                    "noexcept",
+                    "default"
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 195,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L195"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs an empty list with storage for `reserve_bytes` bytes.",
+                  "flags": [
+                    "explicit",
                     "noexcept"
                   ],
                   "params": [
                     {
-                      "name": "ok",
-                      "type": "bool*",
-                      "default": "nullptr",
-                      "description": "If non-null: set to `true` for a normal entry or for having reached the end cleanly. Set to `false` only once next() has hit a claimed length that ran past the available data."
+                      "name": "reserve_bytes",
+                      "type": "uint32_t",
+                      "description": "Initial capacity in bytes."
                     }
                   ],
-                  "return": {
-                    "type": "tlv_node",
-                    "description": "The current entry."
-                  },
                   "source": {
                     "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 210,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L210"
+                    "line": 201,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L201"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs a list by copying an array of nodes back to back.",
+                  "notes": [
+                    {
+                      "type": "warn",
+                      "content": "Copying data, not borrowing it."
+                    }
+                  ],
+                  "params": [
+                    {
+                      "name": "head",
+                      "type": "tlv_node*",
+                      "description": "Array of nodes."
+                    },
+                    {
+                      "name": "count",
+                      "type": "uint32_t",
+                      "description": "Number of nodes in the array."
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 216,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L216"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs a list over existing bytes without copying them.",
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "description": "Bytes holding zero or more entries."
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 250,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L250"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs an owning copy of another list.",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "o",
+                      "type": "const TLV&"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 257,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L257"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "TLV",
+                  "access": "public",
+                  "brief": "Constructs a list by taking over another list's storage.",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "o",
+                      "type": "TLV&&"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 283,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L283"
                   }
                 },
                 {
                   "type": "method",
-                  "name": "reset",
+                  "name": "operator=",
                   "access": "public",
-                  "brief": "Resets traversal to the first entry.",
+                  "brief": "Replaces the contents with an owning copy of another list.",
                   "flags": [
-                    "noexcept"
+                    "noexcept",
+                    "&",
+                    "&",
+                    "&&",
+                    "noexcept",
+                    "&",
+                    "const",
+                    "noexcept",
+                    "const",
+                    "noexcept",
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "params": [
+                    {
+                      "name": "o",
+                      "type": "const TLV&"
+                    }
                   ],
                   "return": {
-                    "type": "void"
+                    "type": "TLV&"
                   },
                   "source": {
                     "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 218,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L218"
-                  }
-                },
-                {
-                  "type": "field",
-                  "name": "m_offset",
-                  "access": "protected",
-                  "field_type": "uint32_t",
-                  "value": "0",
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 225,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L225"
-                  }
-                },
-                {
-                  "type": "field",
-                  "name": "m_current",
-                  "access": "protected",
-                  "field_type": "tlv_node",
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 226,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L226"
-                  }
-                },
-                {
-                  "type": "field",
-                  "name": "m_malformed",
-                  "access": "protected",
-                  "field_type": "bool",
-                  "value": "false",
-                  "source": {
-                    "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 227,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L227"
+                    "line": 290,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L290"
                   }
                 }
               ],
               "source": {
                 "file": "include/lynx/protocols/extras/tlv.h",
-                "line": 36,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L36"
+                "line": 64,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L64"
               }
             },
             {
               "type": "class",
               "name": "tlv_node",
-              "brief": "Represents a single TLV node.",
-              "description": "Extends `view` to provide access to the TLV type code and length fields.",
+              "brief": "A single type-length-value entry, viewed in place.",
+              "description": "The length byte counts the whole entry: type, length and value. An invalid node represents an absent or malformed entry.",
               "bases": [
                 {
                   "name": "view",
@@ -7279,7 +7237,7 @@
                   "type": "method",
                   "name": "code",
                   "access": "public",
-                  "brief": "Returns the TLV type code.",
+                  "brief": "Returns the type code.",
                   "flags": [
                     "const",
                     "noexcept",
@@ -7287,19 +7245,19 @@
                   ],
                   "return": {
                     "type": "uint8_t",
-                    "description": "The one-byte tag value identifying the TLV field."
+                    "description": "The type code, or 0 for an invalid node."
                   },
                   "source": {
                     "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 22,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L22"
+                    "line": 21,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L21"
                   }
                 },
                 {
                   "type": "method",
                   "name": "length",
                   "access": "public",
-                  "brief": "Returns the TLV value length field.",
+                  "brief": "Returns the length byte.",
                   "flags": [
                     "const",
                     "noexcept",
@@ -7307,19 +7265,59 @@
                   ],
                   "return": {
                     "type": "uint8_t",
-                    "description": "The one-byte length of the value portion stored in this TLV node."
+                    "description": "Entry size in bytes including the type and length bytes, or 0 for an invalid node."
                   },
                   "source": {
                     "file": "include/lynx/protocols/extras/tlv.h",
-                    "line": 30,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L30"
+                    "line": 29,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L29"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "vsize",
+                  "access": "public",
+                  "brief": "Returns the number of value bytes.",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t",
+                    "description": "Value size in bytes, or 0 for an empty value or an invalid node."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 37,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L37"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "value",
+                  "access": "public",
+                  "brief": "Returns the value bytes.",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "view",
+                    "description": "A view of the value, or an invalid view when the value is empty."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/extras/tlv.h",
+                    "line": 45,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L45"
                   }
                 }
               ],
               "source": {
                 "file": "include/lynx/protocols/extras/tlv.h",
-                "line": 14,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L14"
+                "line": 13,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/tlv.h#L13"
               }
             },
             {
@@ -10639,8 +10637,8 @@
                       },
                       "source": {
                         "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 529,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L529"
+                        "line": 534,
+                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L534"
                       }
                     },
                     {
@@ -10657,8 +10655,8 @@
                       },
                       "source": {
                         "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 530,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L530"
+                        "line": 535,
+                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L535"
                       }
                     },
                     {
@@ -10675,170 +10673,8 @@
                       },
                       "source": {
                         "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 531,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L531"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "name_",
-                      "access": "private",
-                      "field_type": "const char*",
-                      "value": "nullptr",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 535,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L535"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "fd_",
-                      "access": "private",
-                      "field_type": "int",
-                      "value": "sock::INVALID_FD",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
                         "line": 536,
                         "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L536"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "ifindex_",
-                      "access": "private",
-                      "field_type": "int",
-                      "value": "sock::INVALID_IDX",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 537,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L537"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "promisc_",
-                      "access": "private",
-                      "field_type": "bool",
-                      "value": "false",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 539,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L539"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "snaplen_",
-                      "access": "private",
-                      "field_type": "int",
-                      "value": "LYNX_DEFAULT_SNAPLEN",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 540,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L540"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "timeout_ms_",
-                      "access": "private",
-                      "field_type": "int",
-                      "value": "LYNX_DEFAULT_TIMEOUT_MS",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 541,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L541"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "direction_",
-                      "access": "private",
-                      "field_type": "io_direction",
-                      "value": "io_direction::Both",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 542,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L542"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "rcvbuf_size_",
-                      "access": "private",
-                      "field_type": "int",
-                      "value": "LYNX_RECV_BUFFER_SIZE",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 543,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L543"
-                      }
-                    },
-                    {
-                      "type": "field",
-                      "name": "read_retry_n_",
-                      "access": "private",
-                      "field_type": "size_t",
-                      "value": "0",
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 545,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L545"
-                      }
-                    },
-                    {
-                      "type": "method",
-                      "name": "resolve_dst_mac",
-                      "access": "private",
-                      "brief": "Resolves the destination MAC address for a given IPv4 address.",
-                      "description": "Uses the kernel ARP cache to resolve the MAC address corresponding to the provided IPv4 address. If no valid ARP entry exists, An attempt is made - to resolve the MAC address of the default gateway if one is configured. If resolution fails, an error is recorded in the interface's error state.",
-                      "notes": [
-                        {
-                          "type": "warn",
-                          "content": "No support for IPv6 neighbor discovery yet (current version), so we just return solicited node multicast MAC address for the given IPv6 destination."
-                        }
-                      ],
-                      "params": [
-                        {
-                          "name": "dst",
-                          "type": "const uint8_t*",
-                          "description": "Destination IPv4 address in network byte order."
-                        },
-                        {
-                          "name": "etype",
-                          "type": "uint16_t"
-                        },
-                        {
-                          "name": "bc",
-                          "type": "bool",
-                          "description": "If `true`, returns the broadcast MAC address instead of performing ARP resolution."
-                        }
-                      ],
-                      "return": {
-                        "type": "mn_mac",
-                        "description": "The resolved MAC address, or an empty MAC address if resolution fails."
-                      },
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 564,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L564"
-                      }
-                    },
-                    {
-                      "type": "method",
-                      "name": "resolve_src_mac",
-                      "access": "private",
-                      "brief": "Resolves the source MAC address for the interface.",
-                      "description": "Uses the kernel to retrieve the MAC address of the interface. If resolution fails, an error is recorded in the interface's error state.",
-                      "return": {
-                        "type": "mn_mac",
-                        "description": "The resolved MAC address, or an empty MAC address if resolution fails."
-                      },
-                      "source": {
-                        "file": "include/lynx/net/platform/linux/iface.h",
-                        "line": 601,
-                        "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/net/platform/linux/iface.h#L601"
                       }
                     }
                   ],
@@ -12435,17 +12271,6 @@
                 "line": 76,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/obj.h#L76"
               }
-            },
-            {
-              "type": "field",
-              "name": "err_",
-              "access": "private",
-              "field_type": "Error",
-              "source": {
-                "file": "include/lynx/core/base/obj.h",
-                "line": 82,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/obj.h#L82"
-              }
             }
           ],
           "source": {
@@ -12482,53 +12307,6 @@
             }
           ],
           "content": [
-            {
-              "type": "field",
-              "name": "data_",
-              "access": "private",
-              "field_type": "std::shared_ptr<uint8_t[]>",
-              "source": {
-                "file": "include/lynx/core/buffer.h",
-                "line": 38,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/buffer.h#L38"
-              }
-            },
-            {
-              "type": "field",
-              "name": "offset_",
-              "access": "private",
-              "field_type": "uint32_t",
-              "value": "0",
-              "source": {
-                "file": "include/lynx/core/buffer.h",
-                "line": 39,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/buffer.h#L39"
-              }
-            },
-            {
-              "type": "field",
-              "name": "len_",
-              "access": "private",
-              "field_type": "uint32_t",
-              "value": "0",
-              "source": {
-                "file": "include/lynx/core/buffer.h",
-                "line": 40,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/buffer.h#L40"
-              }
-            },
-            {
-              "type": "field",
-              "name": "cap_",
-              "access": "private",
-              "field_type": "uint32_t",
-              "value": "0",
-              "source": {
-                "file": "include/lynx/core/buffer.h",
-                "line": 41,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/buffer.h#L41"
-              }
-            },
             {
               "type": "constructor",
               "name": "Buffer",
@@ -13360,17 +13138,6 @@
                 "line": 224,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L224"
               }
-            },
-            {
-              "type": "field",
-              "name": "buf_",
-              "access": "private",
-              "field_type": "char[16]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 227,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L227"
-              }
             }
           ],
           "source": {
@@ -13442,17 +13209,6 @@
                 "line": 281,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L281"
               }
-            },
-            {
-              "type": "field",
-              "name": "buf_",
-              "access": "private",
-              "field_type": "char[40]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 284,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L284"
-              }
             }
           ],
           "source": {
@@ -13523,17 +13279,6 @@
                 "file": "include/lynx/core/common.h",
                 "line": 151,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L151"
-              }
-            },
-            {
-              "type": "field",
-              "name": "buf_",
-              "access": "private",
-              "field_type": "char[18]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 154,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L154"
               }
             }
           ],
@@ -13723,17 +13468,6 @@
                 "line": 257,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L257"
               }
-            },
-            {
-              "type": "field",
-              "name": "bytes_",
-              "access": "private",
-              "field_type": "uint8_t[4]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 260,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L260"
-              }
             }
           ],
           "source": {
@@ -13892,17 +13626,6 @@
                 "file": "include/lynx/core/common.h",
                 "line": 309,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L309"
-              }
-            },
-            {
-              "type": "field",
-              "name": "bytes_",
-              "access": "private",
-              "field_type": "uint8_t[16]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 312,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L312"
               }
             }
           ],
@@ -14120,17 +13843,6 @@
                 "line": 197,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L197"
               }
-            },
-            {
-              "type": "field",
-              "name": "bytes_",
-              "access": "private",
-              "field_type": "uint8_t[6]",
-              "source": {
-                "file": "include/lynx/core/common.h",
-                "line": 203,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/common.h#L203"
-              }
             }
           ],
           "source": {
@@ -14308,8 +14020,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 221,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L221"
+                "line": 224,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L224"
               }
             },
             {
@@ -14328,8 +14040,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 252,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L252"
+                "line": 255,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L255"
               }
             },
             {
@@ -14355,8 +14067,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 275,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L275"
+                "line": 278,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L278"
               }
             },
             {
@@ -14375,8 +14087,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 284,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L284"
+                "line": 287,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L287"
               }
             },
             {
@@ -14396,8 +14108,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 299,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L299"
+                "line": 302,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L302"
               }
             },
             {
@@ -14418,8 +14130,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 319,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L319"
+                "line": 322,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L322"
               }
             },
             {
@@ -14449,8 +14161,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 336,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L336"
+                "line": 339,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L339"
               }
             },
             {
@@ -14469,8 +14181,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 349,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L349"
+                "line": 352,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L352"
               }
             },
             {
@@ -14489,8 +14201,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 362,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L362"
+                "line": 365,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L365"
               }
             },
             {
@@ -14506,8 +14218,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 375,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L375"
+                "line": 378,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L378"
               }
             },
             {
@@ -14518,8 +14230,8 @@
               "value": "{}",
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 381,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L381"
+                "line": 384,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L384"
               }
             },
             {
@@ -14530,8 +14242,8 @@
               "value": "{}",
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 387,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L387"
+                "line": 390,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L390"
               }
             },
             {
@@ -14545,8 +14257,8 @@
               "value": "nullptr",
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 391,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L391"
+                "line": 394,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L394"
               }
             },
             {
@@ -14560,8 +14272,8 @@
               "value": "nullptr",
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 394,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L394"
+                "line": 397,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L397"
               }
             },
             {
@@ -14594,8 +14306,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 405,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L405"
+                "line": 408,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L408"
               }
             },
             {
@@ -14616,8 +14328,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 427,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L427"
+                "line": 430,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L430"
               }
             },
             {
@@ -14654,8 +14366,8 @@
               },
               "source": {
                 "file": "include/lynx/core/base/proto.h",
-                "line": 459,
-                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L459"
+                "line": 462,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/core/base/proto.h#L462"
               }
             }
           ],

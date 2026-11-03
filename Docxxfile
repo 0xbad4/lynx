@@ -1,13 +1,19 @@
 {
   "project": {
     "name": "Lynx",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Badr Fadel",
     "repo": "https://github.com/0xbad4/lynx",
     "brief": "C++ header-only networking toolkit for low-level networking and packet utilities.",
     "description": "Lightweight C++ library for low-level networking tasks, packet manipulation, and network interface helpers. It provides a set of reusable building blocks for working with raw network data, address conversion, checksum routines, and networking interfaces.",
 
     "nav": [
+      {
+        "label": "Memory Management",
+        "url": "./MEMORY_MODEL.md",
+        "type": "markdown",
+        "icon": "memory"
+      },
       {
         "label": "Tests",
         "url": "./TESTS.md",
@@ -61,8 +67,7 @@
 
   "access": [
     "public",
-    "protected",
-    "private"
+    "protected"
   ],
 
   "include_undocumented": true,

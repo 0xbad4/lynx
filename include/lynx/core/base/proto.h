@@ -171,8 +171,11 @@ namespace lynx
              */
             void unload(bool ud=false) noexcept {
                 // detach un-dissected bytes
-                if (ud && m_origin_view.size() > hsize()) {
-                    m_origin_view = m_origin_view.first(hsize());
+                if (ud) {
+                    // drop un-dissected captured payload
+                    if (m_origin_view.size() > hsize()) {
+                        m_origin_view = m_origin_view.first(hsize());
+                    }
                 }
 
                 // detach upper layer

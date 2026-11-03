@@ -521,7 +521,12 @@ namespace lynx::uni::io {
 
                     // 2.3 success
                     read_retry_n_ = 0;
-                    return std::make_unique<proto::Raw>(buffer.aspan());
+                    // NOTE: previous: Raw construction potentially will cause dangling pointer.
+                    //                 Raw initialized with view, which doesn't keep shared ptr alive, thus Raw's view may dangle if buffer is destroyed,
+                    //                 which I believe its the case here, since buffer is local to this function and will be destroyed when function returns.
+                    //       new: Raw constructed with shared_ptr to buffer's owner, which keeps the underlying memory alive, 
+                    //            and Raw's view points to that memory, so no dangling pointer issue.
+                    return std::make_unique<proto::Raw>(buffer.owner(), 0, static_cast<uint32_t>(bread));
                 }
             }
             
