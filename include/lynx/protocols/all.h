@@ -28,4 +28,5 @@
 #include "lynx/protocols/ll/ppp/ncp/ipv6cp.h"
 #include "lynx/protocols/ll/ppp/ncp/ipcp.h"
 #include "lynx/protocols/ll/ppp/pppoe.h"
+#include "lynx/protocols/ll/stp/stp.h"
 #include "lynx/protocols/ll/frame.h"

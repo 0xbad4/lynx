@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "Lynx",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "author": "Badr Fadel",
     "repo": "https://github.com/0xbad4/lynx",
     "brief": "C++ header-only networking toolkit for low-level networking and packet utilities.",
@@ -1965,14 +1965,20 @@
                   "flags": [
                     "noexcept"
                   ],
+                  "notes": [
+                    {
+                      "type": "info",
+                      "content": "For STP frames, this field holds a length, not an EtherType. Use Eth::ethertype() as the length when dealing with STP."
+                    }
+                  ],
                   "return": {
                     "type": "uint16_t",
                     "description": "EtherType in host byte order."
                   },
                   "source": {
                     "file": "include/lynx/protocols/ll/eth/eth.h",
-                    "line": 94,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/eth/eth.h#L94"
+                    "line": 97,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/eth/eth.h#L97"
                   }
                 },
                 {
@@ -1984,8 +1990,8 @@
                   "value": "12",
                   "source": {
                     "file": "include/lynx/protocols/ll/eth/eth.h",
-                    "line": 102,
-                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/eth/eth.h#L102"
+                    "line": 105,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/eth/eth.h#L105"
                   }
                 }
               ],
@@ -4408,6 +4414,953 @@
             },
             {
               "type": "class",
+              "name": "LLC",
+              "brief": "IEEE 802.2 Logical Link Control header.",
+              "description": "Carried directly after an Ethernet header whose Type/Length field holds a length (<= 1500) instead of an EtherType.",
+              "notes": [
+                {
+                  "type": "info",
+                  "content": "Only the 1-byte Control form (U-format) is supported. I- and S-format frames use a 2-byte Control field and are not parsed."
+                }
+              ],
+              "bases": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "LLC",
+                  "access": "public",
+                  "brief": "Captures from `v`, or allocates a zeroed header if `v` is empty.",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 28,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L28"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "LLC",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "dsap_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "ssap_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "ctrl_",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 32,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L32"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 44,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L44"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "dsap",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t",
+                    "description": "Destination Service Access Point."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 49,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L49"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "dsap",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 50,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L50"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "ssap",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t",
+                    "description": "Source Service Access Point."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 53,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L53"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "ssap",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 54,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L54"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "control",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t",
+                    "description": "Control field."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 57,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L57"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "control",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/llc.h",
+                    "line": 58,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L58"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/llc.h",
+                "line": 23,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L23"
+              }
+            },
+            {
+              "type": "class",
+              "name": "MSTP",
+              "brief": "IEEE 802.1s / 802.1Q Multiple Spanning Tree BPDU.",
+              "notes": [
+                {
+                  "type": "info",
+                  "content": "hsize() is 102 plus 16 times the number of MSTI messages implied by Version 3 Length when capturing; crafted objects start at 102."
+                }
+              ],
+              "bases": [
+                {
+                  "name": "RSTP",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "RSTP",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "MSTP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 63,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L63"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "MSTP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "flags_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "root_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "root_path_cost_",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "bridge_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "port_id_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "message_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "max_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "hello_time_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "forward_delay_",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 67,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L67"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "is_msti_present",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 101,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L101"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 105,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L105"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version_3_length",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 115,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L115"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version_3_length",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 119,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L119"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "format_selector",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 123,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L123"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "format_selector",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 127,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L127"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "config_name",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "view"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 131,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L131"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "config_name",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "name",
+                      "type": "view"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 135,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L135"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "revision",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 149,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L149"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "revision",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 153,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L153"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "digest",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "view"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 157,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L157"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "digest",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "d",
+                      "type": "view"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 161,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L161"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_internal_path_cost",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 175,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L175"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_internal_path_cost",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 179,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L179"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_bridge_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 183,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L183"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_bridge_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint64_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 187,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L187"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "remaining_hops",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 191,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L191"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "remaining_hops",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 195,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L195"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_regional_root",
+                  "access": "public",
+                  "brief": "CIST Regional Root Identifier (RSTP-compatible Bridge Identifier field).",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 200,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L200"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "cist_regional_root",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint64_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 204,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L204"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "msti_count",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 208,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L208"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "msti_at",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "params": [
+                    {
+                      "name": "i",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "mstp_msti"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 217,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L217"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "set_msti",
+                  "access": "public",
+                  "brief": "Writes one MSTI Configuration Message at index `i`.",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "notes": [
+                    {
+                      "type": "info",
+                      "content": "The object must already have enough bytes for that index (capture of a larger BPDU, or a crafted buffer sized for it)."
+                    }
+                  ],
+                  "params": [
+                    {
+                      "name": "i",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "flags_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "regional_root_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "internal_path_cost_",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "bridge_prio_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "port_prio_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "hops_",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 236,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L236"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 61,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L61"
+              }
+            },
+            {
+              "type": "class",
+              "name": "mstp_msti",
+              "brief": "One MSTI Configuration Message (16 octets).",
+              "bases": [
+                {
+                  "name": "view",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "view",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "method",
+                  "name": "flags",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 20,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L20"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "regional_root",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 24,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L24"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "internal_path_cost",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 33,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L33"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_priority",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 42,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L42"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "port_priority",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 46,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L46"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "remaining_hops",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 50,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L50"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 16,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L16"
+              }
+            },
+            {
+              "type": "class",
               "name": "Packet",
               "bases": [
                 {
@@ -5331,6 +6284,170 @@
             },
             {
               "type": "class",
+              "name": "PVST",
+              "brief": "Cisco PVST+ / Rapid-PVST+ VLAN header.",
+              "description": "Carried after LLC+SNAP (OUI 00:00:0C, PID 0x010B). The 4-octet header is followed by a standard STP (PVST+) or RSTP (Rapid-PVST+) BPDU.\n\nLayout: 0-1  Reserved (0) 2-3  VLAN ID (host order via accessors)",
+              "bases": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "PVST",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 26,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L26"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "PVST",
+                  "access": "public",
+                  "flags": [
+                    "explicit",
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "vlan_id",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 35,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L35"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 46,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L46"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "reserved",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 50,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L50"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "reserved",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 56,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L56"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "vlan",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 61,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L61"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "vlan",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/pvst.h",
+                    "line": 67,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L67"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/pvst.h",
+                "line": 24,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L24"
+              }
+            },
+            {
+              "type": "class",
               "name": "QinQ",
               "bases": [
                 {
@@ -5858,6 +6975,181 @@
                 "file": "include/lynx/protocols/extras/raw.h",
                 "line": 18,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/extras/raw.h#L18"
+              }
+            },
+            {
+              "type": "class",
+              "name": "RSTP",
+              "brief": "IEEE 802.1w Rapid Spanning Tree BPDU.",
+              "description": "Identical to the 802.1D Configuration BPDU with one extra octet: Version 1 Length, which is always 0 (no version-1 parameters follow).\n\nProtocol Version Identifier is 2. BPDU Type is 2.",
+              "bases": [
+                {
+                  "name": "STP",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "STP",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "RSTP",
+                  "access": "protected",
+                  "flags": [
+                    "explicit",
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "tag",
+                      "type": "derived_init"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 18,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L18"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "RSTP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 21,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L21"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "RSTP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "flags_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "root_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "root_path_cost_",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "bridge_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "port_id_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "message_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "max_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "hello_time_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "forward_delay_",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 32,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L32"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 64,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L64"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version_1_length",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 68,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L68"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version_1_length",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/rstp.h",
+                    "line": 72,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L72"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/rstp.h",
+                "line": 16,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L16"
               }
             },
             {
@@ -6430,6 +7722,1546 @@
                 "file": "include/lynx/protocols/tl/segment.h",
                 "line": 9,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/tl/segment.h#L9"
+              }
+            },
+            {
+              "type": "class",
+              "name": "SNAP",
+              "brief": "IEEE 802.2 Subnetwork Access Protocol header.",
+              "description": "Follows an LLC header with DSAP = SSAP = 0xAA and Control = UI (0x03). PVST+ BPDUs are carried in SNAP with Cisco OUI 00:00:0C and PID 0x010B.",
+              "bases": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "SNAP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 25,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L25"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "SNAP",
+                  "access": "public",
+                  "brief": "Crafts a SNAP header.",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "oui_",
+                      "type": "uint32_t",
+                      "description": "Organizationally Unique Identifier (24-bit, stored in the low 24 bits)."
+                    },
+                    {
+                      "name": "pid_",
+                      "type": "uint16_t",
+                      "description": "Protocol identifier in host byte order."
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 34,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L34"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 45,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L45"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "oui",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t",
+                    "description": "24-bit OUI in the low 24 bits of the value."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 50,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L50"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "oui",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 56,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L56"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "pid",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t",
+                    "description": "Protocol ID in host byte order."
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 63,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L63"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "pid",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 69,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L69"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "is_pvst",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/snap.h",
+                    "line": 74,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L74"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 23,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L23"
+              }
+            },
+            {
+              "type": "class",
+              "name": "SPB",
+              "brief": "IEEE 802.1aq Shortest Path Bridging BPDU.",
+              "description": "SPT BPDUs reuse the MSTP layout with Protocol Version Identifier 4.",
+              "bases": [
+                {
+                  "name": "MSTP",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "MSTP",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "SPB",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/mstp.h",
+                    "line": 266,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L266"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 264,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L264"
+              }
+            },
+            {
+              "type": "class",
+              "name": "STP",
+              "brief": "IEEE 802.1D Configuration BPDU.",
+              "description": "Encapsulated in IEEE 802.2 LLC (DSAP = SSAP = 0x42, Control = UI). Timer fields are in 1/256 second units, matching the on-wire encoding.",
+              "notes": [
+                {
+                  "type": "info",
+                  "content": "STP frames are carried in IEEE 802.3 / LLC, so the Ethernet type field holds a length, not an EtherType. Use Eth::ethertype() as the length when dealing with STP."
+                }
+              ],
+              "bases": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "STP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 50,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L50"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "STP",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "version_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "type_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "flags_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "root_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "root_path_cost_",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "bridge_id_",
+                      "type": "uint64_t"
+                    },
+                    {
+                      "name": "port_id_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "message_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "max_age_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "hello_time_",
+                      "type": "uint16_t"
+                    },
+                    {
+                      "name": "forward_delay_",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 58,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L58"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 90,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L90"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "protocol_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 94,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L94"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "protocol_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 97,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L97"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 99,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L99"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 100,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L100"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "type",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 102,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L102"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "type",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 103,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L103"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "flags",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 105,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L105"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "flags",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 106,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L106"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 108,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L108"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint64_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 109,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L109"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_path_cost",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 111,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L111"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_path_cost",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 112,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L112"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 114,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L114"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint64_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 115,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L115"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "port_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 117,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L117"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "port_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 118,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L118"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "message_age",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 120,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L120"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "message_age",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 121,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L121"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "max_age",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 123,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L123"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "max_age",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 124,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L124"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hello_time",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 126,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L126"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hello_time",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 127,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L127"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "forward_delay",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 129,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L129"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "forward_delay",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 130,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L130"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_priority",
+                  "access": "public",
+                  "brief": "High 16 bits of the Root Identifier (priority + system ID extension).",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 133,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L133"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_priority",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "prio",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 137,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L137"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_mac",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "mn_mac"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 142,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L142"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "root_mac",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "mac",
+                      "type": "const mn_mac&"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 146,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L146"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_priority",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 150,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L150"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_priority",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "prio",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 154,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L154"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_mac",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "mn_mac"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 159,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L159"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "bridge_mac",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "mac",
+                      "type": "const mn_mac&"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 163,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L163"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "port_role",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 167,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L167"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "port_role",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "role",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 171,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L171"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "topology_change",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 177,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L177"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "proposal",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 181,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L181"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "learning",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 185,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L185"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "forwarding",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 189,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L189"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "agreement",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 193,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L193"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "topology_change_ack",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "bool"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 197,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L197"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "get_u16",
+                  "access": "protected",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 202,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L202"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "put_u16",
+                  "access": "protected",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 208,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L208"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "get_u32",
+                  "access": "protected",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 213,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L213"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "put_u32",
+                  "access": "protected",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "v",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 219,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L219"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "get_u64",
+                  "access": "protected",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "uint64_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 224,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L224"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "put_u64",
+                  "access": "protected",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "off",
+                      "type": "uint32_t"
+                    },
+                    {
+                      "name": "v",
+                      "type": "uint64_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 230,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L230"
+                  }
+                },
+                {
+                  "type": "struct",
+                  "name": "derived_init",
+                  "access": "protected",
+                  "brief": "Leaves the origin view unset so a derived BPDU can allocate its own header size.",
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 239,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L239"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "STP",
+                  "access": "protected",
+                  "flags": [
+                    "explicit",
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "",
+                      "type": "derived_init"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 240,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L240"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 48,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L48"
+              }
+            },
+            {
+              "type": "class",
+              "name": "STP_TCN",
+              "brief": "IEEE 802.1D Topology Change Notification BPDU (4 octets).",
+              "bases": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "parent": [
+                {
+                  "name": "ProtocolBaseObject",
+                  "access": "public"
+                }
+              ],
+              "content": [
+                {
+                  "type": "constructor",
+                  "name": "STP_TCN",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "view",
+                      "default": "{}"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 248,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L248"
+                  }
+                },
+                {
+                  "type": "constructor",
+                  "name": "STP_TCN",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "version_",
+                      "type": "uint8_t"
+                    },
+                    {
+                      "name": "type_",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 252,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L252"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "hsize",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "override",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint32_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 264,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L264"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "protocol_id",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint16_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 268,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L268"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "protocol_id",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint16_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 274,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L274"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 279,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L279"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "version",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 280,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L280"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "type",
+                  "access": "public",
+                  "flags": [
+                    "const",
+                    "noexcept",
+                    "nodiscard"
+                  ],
+                  "return": {
+                    "type": "uint8_t"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 282,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L282"
+                  }
+                },
+                {
+                  "type": "method",
+                  "name": "type",
+                  "access": "public",
+                  "flags": [
+                    "noexcept"
+                  ],
+                  "params": [
+                    {
+                      "name": "v",
+                      "type": "uint8_t"
+                    }
+                  ],
+                  "return": {
+                    "type": "void"
+                  },
+                  "source": {
+                    "file": "include/lynx/protocols/ll/stp/stp.h",
+                    "line": 283,
+                    "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L283"
+                  }
+                }
+              ],
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 246,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L246"
               }
             },
             {
@@ -7650,6 +10482,24 @@
                 "file": "include/lynx/protocols/tl/udp.h",
                 "line": 22,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/tl/udp.h#L22"
+              }
+            },
+            {
+              "type": "function",
+              "name": "pvst_group_mac",
+              "brief": "Cisco PVST+ / Rapid-PVST+ group address (01:00:0C:CC:CC:CD).",
+              "flags": [
+                "inline",
+                "noexcept",
+                "nodiscard"
+              ],
+              "return": {
+                "type": "mn_mac"
+              },
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/pvst.h",
+                "line": 9,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L9"
               }
             },
             {
@@ -9009,6 +11859,116 @@
             },
             {
               "type": "variable",
+              "name": "LLC_CTRL_UI",
+              "field_type": "icu8",
+              "value": "0x03",
+              "source": {
+                "file": "include/lynx/protocols/ll/llc.h",
+                "line": 12,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L12"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "LLC_HDR_LEN",
+              "field_type": "icu32",
+              "value": "3",
+              "source": {
+                "file": "include/lynx/protocols/ll/llc.h",
+                "line": 8,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L8"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "LLC_SAP_SNAP",
+              "field_type": "icu8",
+              "value": "0xAA",
+              "source": {
+                "file": "include/lynx/protocols/ll/llc.h",
+                "line": 11,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L11"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "LLC_SAP_STP",
+              "field_type": "icu8",
+              "value": "0x42",
+              "source": {
+                "file": "include/lynx/protocols/ll/llc.h",
+                "line": 10,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/llc.h#L10"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_CFG_DIGEST_LEN",
+              "field_type": "icu32",
+              "value": "16",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 8,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L8"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_CFG_ID_LEN",
+              "field_type": "icu32",
+              "value": "51",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 6,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L6"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_CFG_NAME_LEN",
+              "field_type": "icu32",
+              "value": "32",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 7,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L7"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_HDR_LEN",
+              "field_type": "icu32",
+              "value": "102",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 11,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L11"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_MSTI_LEN",
+              "field_type": "icu32",
+              "value": "16",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 9,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L9"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "MSTP_V3_FIXED_LEN",
+              "field_type": "icu32",
+              "value": "64",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/mstp.h",
+                "line": 10,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/mstp.h#L10"
+              }
+            },
+            {
+              "type": "variable",
               "name": "PAP_CODE_AUTH_ACK",
               "field_type": "icu8",
               "value": "2",
@@ -9465,6 +12425,17 @@
             },
             {
               "type": "variable",
+              "name": "PVST_HDR_LEN",
+              "field_type": "icu32",
+              "value": "4",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/pvst.h",
+                "line": 6,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/pvst.h#L6"
+              }
+            },
+            {
+              "type": "variable",
               "name": "QINQ_ETHERTYPE_BEGIN",
               "field_type": "icu32",
               "value": "20",
@@ -9516,6 +12487,17 @@
                 "file": "include/lynx/protocols/ll/eth/qinq.h",
                 "line": 9,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/eth/qinq.h#L9"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "RSTP_HDR_LEN",
+              "field_type": "icu32",
+              "value": "36",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/rstp.h",
+                "line": 6,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/rstp.h#L6"
               }
             },
             {
@@ -9840,6 +12822,303 @@
                 "file": "include/lynx/protocols/tl/sctp.h",
                 "line": 10,
                 "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/tl/sctp.h#L10"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "SNAP_HDR_LEN",
+              "field_type": "icu32",
+              "value": "5",
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 9,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L9"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "SNAP_OUI_CISCO",
+              "field_type": "icu32",
+              "value": "0x00000C",
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 12,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L12"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "SNAP_OUI_RFC1042",
+              "field_type": "icu32",
+              "value": "0x000000",
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 11,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L11"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "SNAP_PID_PVST",
+              "field_type": "icu16",
+              "value": "0x010B",
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 14,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L14"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "SNAP_PID_VLAN",
+              "field_type": "icu16",
+              "value": "0x8100",
+              "source": {
+                "file": "include/lynx/protocols/ll/snap.h",
+                "line": 15,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/snap.h#L15"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_AGREEMENT",
+              "field_type": "icu8",
+              "value": "0x40",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 30,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L30"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_FORWARDING",
+              "field_type": "icu8",
+              "value": "0x20",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 29,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L29"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_LEARNING",
+              "field_type": "icu8",
+              "value": "0x10",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 28,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L28"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_PORT_ROLE_MASK",
+              "field_type": "icu8",
+              "value": "0x0C",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 26,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L26"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_PORT_ROLE_SHIFT",
+              "field_type": "icu8",
+              "value": "2",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 27,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L27"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_PROPOSAL",
+              "field_type": "icu8",
+              "value": "0x02",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 25,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L25"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_TOPOLOGY_CHANGE",
+              "field_type": "icu8",
+              "value": "0x01",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 24,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L24"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_FLAG_TOPOLOGY_CHANGE_ACK",
+              "field_type": "icu8",
+              "value": "0x80",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 31,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L31"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_HDR_LEN",
+              "field_type": "icu32",
+              "value": "35",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 10,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L10"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_PORT_ROLE_ALTERNATE",
+              "field_type": "icu8",
+              "value": "1",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 34,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L34"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_PORT_ROLE_DESIGNATED",
+              "field_type": "icu8",
+              "value": "3",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 36,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L36"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_PORT_ROLE_ROOT",
+              "field_type": "icu8",
+              "value": "2",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 35,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L35"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_PORT_ROLE_UNKNOWN",
+              "field_type": "icu8",
+              "value": "0",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 33,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L33"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_PROTO_ID",
+              "field_type": "icu16",
+              "value": "0x0000",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 13,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L13"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_TCN_HDR_LEN",
+              "field_type": "icu32",
+              "value": "4",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 11,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L11"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_TYPE_CONFIG",
+              "field_type": "icu8",
+              "value": "0x00",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 20,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L20"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_TYPE_RSTP",
+              "field_type": "icu8",
+              "value": "0x02",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 21,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L21"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_TYPE_TCN",
+              "field_type": "icu8",
+              "value": "0x80",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 22,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L22"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_VERSION_MSTP",
+              "field_type": "icu8",
+              "value": "3",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 17,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L17"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_VERSION_RSTP",
+              "field_type": "icu8",
+              "value": "2",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 16,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L16"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_VERSION_SPB",
+              "field_type": "icu8",
+              "value": "4",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 18,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L18"
+              }
+            },
+            {
+              "type": "variable",
+              "name": "STP_VERSION_STP",
+              "field_type": "icu8",
+              "value": "0",
+              "source": {
+                "file": "include/lynx/protocols/ll/stp/stp.h",
+                "line": 15,
+                "url": "https://github.com/0xbad4/lynx/blob/main/include/lynx/protocols/ll/stp/stp.h#L15"
               }
             },
             {

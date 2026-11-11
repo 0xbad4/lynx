@@ -90,6 +90,9 @@ namespace lynx::proto
             /**
              * @brief Gets the Ethernet EtherType.
              * @return EtherType in host byte order.
+             * 
+             * @note For STP frames, this field holds a length, not an EtherType. Use
+             *       Eth::ethertype() as the length when dealing with STP.
              */
             uint16_t ethertype() noexcept {
                 uint16_t etype = 0;
